@@ -1,5 +1,6 @@
 package org.identifiers.db;
 
+import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -32,8 +33,16 @@ public class DbUtilities
 	{
 		Connection connection = null;
 		
+//		try (Socket sock = new Socket("172.17.1.107", Integer.parseInt(PORT)))
+//		{
+//			System.out.println("+ Loads the JDBC driver...");
+//		} catch (Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+		
 		// loads the JDBC driver
-        //System.out.println("+ Loads the JDBC driver...");
+//        System.out.println("+ Loads the JDBC driver...");
         try
         {
             Class.forName(DRIVER);
@@ -45,7 +54,7 @@ public class DbUtilities
         }
         
         // creates a connection to the database
-        //System.out.println("+ Creates the connection to the database...");
+//        System.out.println("+ Creates the connection to the database...");
         String url = "jdbc:mysql://" + SERVER +  ":" + PORT + "/" + DATABASE;   // a JDBC url
         try
         {

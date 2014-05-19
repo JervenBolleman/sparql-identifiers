@@ -2,9 +2,13 @@ package ch.isbsib.sparql.identifiers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.identifiers.data.URIextended;
+import org.identifiers.db.RegistryDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,6 +52,45 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 			MalformedQueryException, RepositoryException, SailException {
 
 		IdentifiersOrgStore rep = new IdentifiersOrgStore();
+		rep.setDao(new RegistryDao() {
+			@Override
+			public List<URIextended> getSameAsURIs(String uri) {
+				List<URIextended> urls = null;
+				urls = new ArrayList<URIextended>();
+				if (uri.equals("http://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0006915")) {
+					urls.add(new URIextended(
+							"http://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0006915",
+							0));
+					urls.add(new URIextended(
+							"http://amigo.geneontology.org/cgi-bin/amigo/term_details?term=GO:0006915",
+							0));
+					urls.add(new URIextended(
+							"http://www.bioinf.ebc.ee/EP/EP/GO/?Q=GO:0006915",
+							1));
+					urls.add(new URIextended(
+							"http://www.informatics.jax.org/searches/GO.cgi?id=GO:0006915",
+							0));
+					urls.add(new URIextended(
+							"http://www.pantherdb.org/panther/category.do?categoryAcc=GO:0006915",
+							0));
+					urls.add(new URIextended(
+							"http://amigo2.berkeleybop.org/cgi-bin/amigo2/amigo/term/GO:0006915",
+							0));
+					urls.add(new URIextended(
+							"http://purl.obolibrary.org/obo/GO_0006915", 0));
+					urls.add(new URIextended("http://bio2rdf.org/GO:0006915", 0));
+					urls.add(new URIextended(
+							"http://identifiers.org/go/GO:0006915", 0));
+					urls.add(new URIextended("urn:miriam:go:GO:0006915", 0));
+					urls.add(new URIextended(
+							"http://www.geneontology.org/GO:0006915", 0));
+					urls.add(new URIextended("urn:miriam:obo.go:GO:0006915", 0));
+					urls.add(new URIextended(
+							"http://identifiers.org/obo.go/GO:0006915", 0));
+				}
+				return urls;
+			}
+		});
 		rep.setDataDir(dataDir);
 		rep.setValueFactory(new ValueFactoryImpl());
 		SailRepository sr = new SailRepository(rep);
@@ -55,7 +98,7 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
 				QueryLanguage.SPARQL, query1);
 		TupleQueryResult eval = pTQ.evaluate();
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 13; i++) {
 			assertTrue(eval.hasNext());
 			assertNotNull(eval.next());
 		}

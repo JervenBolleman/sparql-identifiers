@@ -3,9 +3,7 @@ package ch.isbsib.sparql.identifiers;
 import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.EmptyIteration;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.identifiers.data.URIextended;
 import org.identifiers.db.RegistryDao;
@@ -20,11 +18,13 @@ import org.openrdf.query.algebra.evaluation.TripleSource;
 
 public class IdentifiersOrgTripleSource implements TripleSource {
 
-	private ValueFactory vf;
+	private final ValueFactory vf;
+	private final RegistryDao dao;
 	private final static String JDBC_CONNECT_STRING = "";
 	
-	public IdentifiersOrgTripleSource(ValueFactory vf) {
+	public IdentifiersOrgTripleSource(ValueFactory vf, RegistryDao dao) {
 		this.vf = vf;
+		this.dao = dao;
 	}
 
 	@Override
@@ -60,10 +60,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 	}
 
 	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj) {
-		List<StatementImpl> res = new ArrayList<StatementImpl>();
-		
-		RegistryDao registryDao = new RegistryDao();
-		final Iterator<URIextended> iter = registryDao.getSameAsURIs(subj.stringValue()).iterator();
+		final Iterator<URIextended> iter = dao.getSameAsURIs(subj.stringValue()).iterator();
 		
 		return new Iterator<StatementImpl>() {
 

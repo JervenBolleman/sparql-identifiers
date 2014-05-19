@@ -7,6 +7,7 @@ import info.aduna.iteration.EmptyIteration;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.identifiers.db.RegistryDao;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -35,9 +36,11 @@ import org.openrdf.sail.UpdateContext;
 public class IdentifiersOrgConnection implements SailConnection {
 	private final ValueFactory vf;
 
-	public IdentifiersOrgConnection(ValueFactory vf) {
+	private final RegistryDao dao;
+	public IdentifiersOrgConnection(ValueFactory vf, RegistryDao dao) {
 		super();
 		this.vf = vf;
+		this.dao = dao;
 	}
 
 	@Override
@@ -55,7 +58,8 @@ public class IdentifiersOrgConnection implements SailConnection {
 			TupleExpr tupleExpr, Dataset dataset, BindingSet bindings,
 			boolean includeInferred) throws SailException {
 		try {
-			IdentifiersOrgTripleSource tripleSource = new IdentifiersOrgTripleSource(vf);
+			
+			IdentifiersOrgTripleSource tripleSource = new IdentifiersOrgTripleSource(vf, dao);
 			EvaluationStrategy strategy = new EvaluationStrategyImpl(tripleSource);
 			tupleExpr = tupleExpr.clone();
 			new BindingAssigner().optimize(tupleExpr, dataset, bindings);
@@ -80,7 +84,7 @@ public class IdentifiersOrgConnection implements SailConnection {
 
 	    final CloseableIteration<StatementImpl, QueryEvaluationException> bedFileFilterReader;
 		try {
-			bedFileFilterReader = new IdentifiersOrgTripleSource(vf).getStatements(subj, pred, obj, contexts);
+			bedFileFilterReader = new IdentifiersOrgTripleSource(vf, dao).getStatements(subj, pred, obj, contexts);
 		} catch (QueryEvaluationException e1) {
 			throw new SailException(e1);
 		}
