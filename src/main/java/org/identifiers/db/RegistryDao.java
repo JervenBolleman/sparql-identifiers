@@ -43,7 +43,8 @@ public class RegistryDao
         try
         {
 
-            String query = "SELECT convertPrefix, ptr_datatype FROM mir_resource WHERE `convertPrefix` LIKE '"+uri.substring(0,uri.indexOf("/", 10))+"%'";
+            final String uriTobe = uri.substring(0,uri.indexOf("/", 10));
+			String query = "SELECT convertPrefix, ptr_datatype FROM mir_resource WHERE `convertPrefix` LIKE '"+uriTobe+"%'";
             
             try
             {
@@ -109,6 +110,7 @@ public class RegistryDao
         {
             throw new RuntimeException("Sorry, an error occurred while dealing with your request.");
         }
+        System.out.println("u"+urls.size());
         return urls;
 	}
 }

@@ -9,8 +9,8 @@ import org.openrdf.sail.helpers.SailBase;
 public class IdentifiersOrgStore extends SailBase {
 	private ValueFactory vf;
 
-	private RegistryDao dao;
-	
+	private RegistryDao dao = new RegistryDao();
+
 	@Override
 	public boolean isWritable() throws SailException {
 		return false;

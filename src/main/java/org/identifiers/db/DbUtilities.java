@@ -33,14 +33,6 @@ public class DbUtilities
 	{
 		Connection connection = null;
 		
-//		try (Socket sock = new Socket("172.17.1.107", Integer.parseInt(PORT)))
-//		{
-//			System.out.println("+ Loads the JDBC driver...");
-//		} catch (Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-		
 		// loads the JDBC driver
 //        System.out.println("+ Loads the JDBC driver...");
         try
