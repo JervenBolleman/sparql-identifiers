@@ -67,16 +67,11 @@ public class DbUtilities
 	 * @param connection
 	 * @param stmt
 	 */
-	public static void closeDbConnection(Connection connection, PreparedStatement stmt)
+	public static void closeDbConnection(Connection connection)
 	{
         // closes the connection
         try
         {
-            if (null !=  stmt)
-            {
-            	//System.out.println("- Closes the prepared statement");
-            	stmt.close();
-            }
             if (null != connection)
             {
             	//System.out.println("- Closes the connection");
