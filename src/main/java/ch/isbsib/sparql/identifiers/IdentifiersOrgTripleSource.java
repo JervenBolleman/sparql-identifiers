@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.identifiers.data.URIextended;
+import org.identifiers.db.RegistryDao;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -31,7 +33,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			throws QueryEvaluationException {
 		if (subj == null || ! pred.equals(OWL.SAMEAS) || obj != null)
 			return new EmptyIteration<StatementImpl, QueryEvaluationException>();
-		final Iterator<StatementImpl> iter = getResultsViaJDBC();
+		final Iterator<StatementImpl> iter = getResultsViaJDBC(subj);
 		return new CloseableIteration<StatementImpl, QueryEvaluationException>() {
 
 			@Override
@@ -57,11 +59,32 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 		};
 	}
 
-	private Iterator<StatementImpl> getResultsViaJDBC() {
+	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj) {
 		List<StatementImpl> res = new ArrayList<StatementImpl>();
 		
-		final Iterator<StatementImpl> iter = res.iterator();
-		return iter;
+		RegistryDao registryDao = new RegistryDao();
+		final Iterator<URIextended> iter = registryDao.getSameAsURIs(subj.stringValue()).iterator();
+		
+		return new Iterator<StatementImpl>() {
+
+			@Override
+			public boolean hasNext() {
+				return iter.hasNext();
+			}
+
+			@Override
+			public StatementImpl next() {
+				final URIextended next = iter.next();
+				URI uri = vf.createURI(next.getURI());
+				return new StatementImpl(subj, OWL.SAMEAS, uri);
+			}
+
+			@Override
+			public void remove() {
+				iter.remove();
+				
+			}
+		};
 	}
 
 	@Override
