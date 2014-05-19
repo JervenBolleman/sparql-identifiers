@@ -39,7 +39,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.1</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
@@ -52,7 +52,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>ch.isbsib.sparql.bed.CLI</mainClass>
+							<mainClass>ch.isbsib.sparql.identifiers.CLI</mainClass>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib</classpathPrefix>
 						</manifest>
@@ -68,7 +68,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>ch.isbsib.sparql.bed.CLI</mainClass>
+							<mainClass>ch.isbsib.sparql.identifiers.CLI</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

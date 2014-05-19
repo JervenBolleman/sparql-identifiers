@@ -28,8 +28,11 @@ public class CLI {
 			RepositoryException, QueryEvaluationException, SailException,
 			RDFHandlerException, IOException, TupleQueryResultHandlerException {
 		IdentifiersOrgStore rep = new IdentifiersOrgStore();
-		File dataDir = mkTempDir();	
-		System.out.println("Query is" + args[1]);
+		File dataDir = mkTempDir();
+		if (args[0] == null)
+		{
+			System.err.println("This script expects a variable which contains a SPARQL string ");
+		}
 		try {
 			rep.setDataDir(dataDir);
 			//TODO inject JDBC code.
@@ -37,7 +40,7 @@ public class CLI {
 			SailRepository sr = new SailRepository(rep);
 			rep.initialize();
 			Query pTQ = sr.getConnection().prepareTupleQuery(
-					QueryLanguage.SPARQL, args[1]);
+					QueryLanguage.SPARQL, args[0]);
 			if (pTQ instanceof TupleQuery) {
 
 				SPARQLResultsCSVWriter handler = new SPARQLResultsCSVWriter(System.out);
@@ -52,7 +55,7 @@ public class CLI {
 				createWriter.write(evaluate);
 			}
 		} finally {
-			System.out.println("done");
+			System.err.println("done");
 			deleteDir(dataDir);
 			System.exit(0);
 		}

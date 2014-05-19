@@ -20,7 +20,6 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 
 	private final ValueFactory vf;
 	private final RegistryDao dao;
-	private final static String JDBC_CONNECT_STRING = "";
 	
 	public IdentifiersOrgTripleSource(ValueFactory vf, RegistryDao dao) {
 		this.vf = vf;
@@ -33,7 +32,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			throws QueryEvaluationException {
 		if (subj == null || ! pred.equals(OWL.SAMEAS) || obj != null)
 			return new EmptyIteration<StatementImpl, QueryEvaluationException>();
-		final Iterator<StatementImpl> iter = getResultsViaJDBC(subj);
+		final Iterator<StatementImpl> iter = getResultsViaJDBC(subj, contexts);
 		return new CloseableIteration<StatementImpl, QueryEvaluationException>() {
 
 			@Override
@@ -59,7 +58,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 		};
 	}
 
-	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj) {
+	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj, Resource... contexts) {
 		final Iterator<URIextended> iter = dao.getSameAsURIs(subj.stringValue()).iterator();
 		
 		return new Iterator<StatementImpl>() {
