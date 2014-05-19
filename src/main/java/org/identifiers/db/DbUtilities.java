@@ -1,6 +1,5 @@
 package org.identifiers.db;
 
-import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;

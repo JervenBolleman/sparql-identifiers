@@ -18,6 +18,11 @@ import java.util.List;
  */
 public class RegistryDao {
 
+	private static final String QUERY = "SELECT convertPrefix, obsolete "
+			+ ", ( SELECT convertPrefix FROM mir_resource WHERE convertPrefix LIKE ? LIMIT 1 ORDER BY size(convertPrefix)) AS original_prefix "
+			+ "FROM mir_resource WHERE urischeme =1 "
+			+ "AND ptr_datatype = ( SELECT ptr_datatype FROM mir_resource WHERE convertPrefix LIKE ? )";
+
 	/**
 	 * Returns all URIs sameAs the provided one.
 	 * 
@@ -26,67 +31,34 @@ public class RegistryDao {
 	 */
 	public List<URIextended> getSameAsURIs(String uri) {
 
-		List<URIextended> urls = null;
-
 		// initialisation of the database connection
 		try (Connection connection = DbUtilities.initDbConnection()) {
-
-			final String uriTobe = uri.substring(0, uri.indexOf("/", 10))+'%';
-			String query = "SELECT convertPrefix, ptr_datatype FROM mir_resource WHERE `convertPrefix` LIKE ?";
-
-			String dataTypeId = null;
-			String identifier = null;
-
-			try (PreparedStatement stmt = connection.prepareStatement(query)) {
-				stmt.setString(1, uriTobe);
-				try (ResultSet rs = stmt.executeQuery()) {
-					while (rs.next()) {
-						String convertPrefix = rs.getString("convertPrefix");
-						if (uri.contains(convertPrefix)) {
-							dataTypeId = rs.getString("ptr_datatype");
-							identifier = uri.substring(convertPrefix.length());
-						}
-					}
-				}
-			} catch (SQLException e) {
-				System.err
-						.println("Error while creating the prepared statement!");
-				System.err.println("SQL Exception raised: " + e.getMessage());
-				throw new RuntimeException(
-						"Sorry, an error occurred while dealing with your request.",
-						e);
-			}
-
-			// logger.debug("SQL prepared query: " + stmt.toString());
-
-			query = "SELECT convertPrefix, obsolete FROM mir_resource WHERE ptr_datatype=? and urischeme=1";
-
-			try (PreparedStatement stmt = connection.prepareStatement(query)) {
-				stmt.setString(1, dataTypeId);
-				try (ResultSet rs = stmt.executeQuery()) {
-
-					urls = new ArrayList<URIextended>();
-					while (rs.next()) {
-						urls.add(new URIextended(rs.getString("convertPrefix")
-								+ identifier, rs.getInt("obsolete")));
-					}
-				}
-			} catch (SQLException e) {
-				System.err
-						.println("Error while creating the prepared statement!");
-				System.err.println("SQL Exception raised: " + e.getMessage());
-				throw new RuntimeException(
-						"Sorry, an error occurred while dealing with your request.",
-						e);
-			}
-			// logger.debug("SQL prepared query: " + stmt.toString());
-
+			return fetchUrisFromConnection(connection, uri);
 		} catch (SQLException e1) {
 			throw new RuntimeException(
 					"Sorry, an error occurred while dealing with your request.",
 					e1);
 		}
-		System.out.println("u" + urls.size());
+	}
+
+	private List<URIextended> fetchUrisFromConnection(Connection connection,
+			String uri) throws SQLException {
+		List<URIextended> urls = new ArrayList<URIextended>();
+		final String uriTobe = uri.substring(0, uri.lastIndexOf("/") + 1) + '%';
+
+		try (PreparedStatement stmt = connection.prepareStatement(QUERY)) {
+			stmt.setString(1, uriTobe);
+			stmt.setString(2, uriTobe);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String identifier = uri.substring(rs.getString(
+							"original_prefix").length());
+					final String uri2 = rs.getString("convertPrefix")
+							+ identifier;
+					urls.add(new URIextended(uri2, rs.getInt("obsolete")));
+				}
+			}
+		}
 		return urls;
 	}
 }
