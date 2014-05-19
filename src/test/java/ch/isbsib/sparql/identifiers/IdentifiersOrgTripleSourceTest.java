@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -101,8 +102,11 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 				QueryLanguage.SPARQL, query1);
 		TupleQueryResult eval = pTQ.evaluate();
 		for (int i = 0; i < 13; i++) {
+//		for (int i = 0; i < 10; i++) {
 			assertTrue(eval.hasNext());
-			assertNotNull(eval.next());
+			final BindingSet next = eval.next();
+			assertNotNull(next);
+			assertTrue(next.getBinding("target").getValue().toString().endsWith("0006915"));
 		}
 		assertFalse(eval.hasNext());
 	}
