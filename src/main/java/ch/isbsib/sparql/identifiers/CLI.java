@@ -24,9 +24,7 @@ import org.openrdf.rio.turtle.TurtleWriter;
 import org.openrdf.sail.SailException;
 
 public class CLI {
-	public static void main(String[] args) throws MalformedQueryException,
-			RepositoryException, QueryEvaluationException, SailException,
-			RDFHandlerException, IOException, TupleQueryResultHandlerException {
+	public static void main(String[] args)  {
 		IdentifiersOrgStore rep = new IdentifiersOrgStore();
 		File dataDir = mkTempDir();
 		if (args[0] == null)
@@ -54,8 +52,14 @@ public class CLI {
 				boolean evaluate = ((BooleanQuery) pTQ).evaluate();
 				createWriter.write(evaluate);
 			}
-		} finally {
 			System.err.println("done");
+		} catch (MalformedQueryException e){
+			System.err.println("Query syntax is broken");
+			System.exit(2);
+		} catch (SailException | IOException | QueryEvaluationException | RDFHandlerException | TupleQueryResultHandlerException  | RepositoryException e) {
+			System.err.println("failed in sesame code");
+			System.exit(1);
+		} finally {
 			deleteDir(dataDir);
 			System.exit(0);
 		}
