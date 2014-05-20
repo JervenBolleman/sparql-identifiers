@@ -3,7 +3,9 @@ package ch.isbsib.sparql.identifiers;
 import info.aduna.iteration.CloseableIteration;
 import info.aduna.iteration.EmptyIteration;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.identifiers.data.URIextended;
 import org.identifiers.db.RegistryDao;
@@ -20,7 +22,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 
 	private final ValueFactory vf;
 	private final RegistryDao dao;
-	
+
 	public IdentifiersOrgTripleSource(ValueFactory vf, RegistryDao dao) {
 		this.vf = vf;
 		this.dao = dao;
@@ -30,9 +32,11 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 	public CloseableIteration<StatementImpl, QueryEvaluationException> getStatements(
 			Resource subj, URI pred, Value obj, Resource... contexts)
 			throws QueryEvaluationException {
-		if (subj == null || ! pred.equals(OWL.SAMEAS) || obj != null)
+		if (!pred.equals(OWL.SAMEAS))
 			return new EmptyIteration<StatementImpl, QueryEvaluationException>();
-		final Iterator<StatementImpl> iter = getResultsViaJDBC(subj, contexts);
+		if (subj == null && obj == null)
+			return new EmptyIteration<StatementImpl, QueryEvaluationException>();
+		final Iterator<StatementImpl> iter = getIterViaJDBC(subj, obj, contexts);
 		return new CloseableIteration<StatementImpl, QueryEvaluationException>() {
 
 			@Override
@@ -48,7 +52,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			@Override
 			public void remove() throws QueryEvaluationException {
 				iter.remove();
-				
+
 			}
 
 			@Override
@@ -58,9 +62,19 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 		};
 	}
 
-	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj, Resource... contexts) {
-		final Iterator<URIextended> iter = dao.getSameAsURIs(subj.stringValue()).iterator();
-		
+	private Iterator<StatementImpl> getIterViaJDBC(Resource subj, Value obj,
+			Resource... contexts) {
+		if (obj instanceof Resource) {
+			return getResultsViaJDBC(subj, (Resource) obj, contexts);
+		} else
+			return getResultsViaJDBC(subj, contexts);
+	}
+
+	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj,
+			Resource... contexts) {
+		final Iterator<URIextended> iter = dao
+				.getSameAsURIs(subj.stringValue()).iterator();
+
 		return new Iterator<StatementImpl>() {
 
 			@Override
@@ -78,9 +92,47 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			@Override
 			public void remove() {
 				iter.remove();
-				
 			}
 		};
+	}
+
+	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj,
+			final Resource obj, Resource... contexts) {
+
+		if (subj == null) {
+			final Iterator<URIextended> iter = dao.getSameAsURIs(
+					obj.stringValue()).iterator();
+			return new Iterator<StatementImpl>() {
+
+				@Override
+				public boolean hasNext() {
+					return iter.hasNext();
+				}
+
+				@Override
+				public StatementImpl next() {
+					final URIextended next = iter.next();
+					URI uri = vf.createURI(next.getURI());
+					return new StatementImpl(subj, OWL.SAMEAS, uri);
+				}
+
+				@Override
+				public void remove() {
+					iter.remove();
+				}
+			};
+		} else {
+			final Iterator<URIextended> iter = dao.getSameAsURIs(
+					obj.stringValue()).iterator();
+			List<StatementImpl> l = new ArrayList<>(1);
+			while (iter.hasNext()) {
+				final URIextended next = iter.next();
+				if (subj.stringValue().equals(next.getURI())) {
+					l.add(new StatementImpl(subj, OWL.SAMEAS, obj));
+				}
+			}
+			return l.iterator();
+		}
 	}
 
 	@Override

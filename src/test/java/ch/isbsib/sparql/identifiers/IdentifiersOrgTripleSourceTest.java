@@ -17,6 +17,7 @@ import org.junit.rules.TemporaryFolder;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.BooleanQuery;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -62,6 +63,22 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 				urls.add(new URIextended("urn:miriam:obo.go:GO:0006915", 0));
 				urls.add(new URIextended(
 						"http://identifiers.org/obo.go/GO:0006915", 0));
+			} else if (uri.contains("uniprot")) {
+				urls.add(new URIextended(
+						"http://www.ebi.uniprot.org/entry/P05067", 1));
+				urls.add(new URIextended(
+						"http://www.pir.uniprot.org/cgi-bin/upEntry?id=P05067",
+						1));
+				urls.add(new URIextended("http://us.expasy.org/uniprot/P05067",
+						1));
+				urls.add(new URIextended(
+						"http://www.uniprot.org/uniprot/P05067", 0));
+				urls.add(new URIextended(
+						"http://purl.uniprot.org/uniprot/P05067", 0));
+				urls.add(new URIextended(
+						"http://www.ncbi.nlm.nih.gov/protein/P05067", 0));
+				urls.add(new URIextended(
+						"http://identifiers.org/uniprot/P05067", 0));
 			}
 			return urls;
 		}
@@ -131,5 +148,57 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 				QueryLanguage.SPARQL, query2);
 		TupleQueryResult eval = pTQ.evaluate();
 		assertFalse(eval.hasNext());
+	}
+	
+	
+
+	String query3 = "PREFIX "
+			+ OWL.PREFIX
+			+ ": <"
+			+ OWL.NAMESPACE
+			+ ">\n SELECT ?target WHERE {<http://www.ebi.uniprot.org/entry/P05067> owl:sameAs ?target}";
+
+	@Test
+	public void testBasicUniProt() throws IOException, QueryEvaluationException,
+			MalformedQueryException, RepositoryException, SailException {
+
+		IdentifiersOrgStore rep = new IdentifiersOrgStore();
+		rep.setDao(new RegistryDaoMock());
+		rep.setDataDir(dataDir);
+		rep.setValueFactory(new ValueFactoryImpl());
+		SailRepository sr = new SailRepository(rep);
+		rep.initialize();
+		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
+				QueryLanguage.SPARQL, query3);
+		TupleQueryResult eval = pTQ.evaluate();
+		for (int i = 0; i < 7; i++) {
+			assertTrue(eval.hasNext());
+			final BindingSet next = eval.next();
+			assertNotNull(next);
+			System.err.println(next.getBinding("target").getValue().toString());
+			assertTrue(next.getBinding("target").getValue().toString().endsWith("P05067"));
+		}
+		assertFalse(eval.hasNext());
+	}
+	
+	String query4= "PREFIX "
+			+ OWL.PREFIX
+			+ ": <"
+			+ OWL.NAMESPACE
+			+ ">\n ASK {<http://www.ebi.uniprot.org/entry/P05067> owl:sameAs <http://www.uniprot.org/uniprot/P05067>}";
+
+	@Test
+	public void testBasicUniProtSameAs() throws IOException, QueryEvaluationException,
+			MalformedQueryException, RepositoryException, SailException {
+
+		IdentifiersOrgStore rep = new IdentifiersOrgStore();
+		rep.setDao(new RegistryDaoMock());
+		rep.setDataDir(dataDir);
+		rep.setValueFactory(new ValueFactoryImpl());
+		SailRepository sr = new SailRepository(rep);
+		rep.initialize();
+		BooleanQuery pTQ = sr.getConnection().prepareBooleanQuery(
+				QueryLanguage.SPARQL, query4);
+		assertTrue("Should return true", pTQ.evaluate());
 	}
 }
