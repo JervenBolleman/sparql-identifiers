@@ -6,6 +6,7 @@ import info.aduna.iteration.EmptyIteration;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.identifiers.db.RegistryDao;
 import org.openrdf.model.Namespace;
@@ -74,7 +75,32 @@ public class IdentifiersOrgConnection implements SailConnection {
 	@Override
 	public CloseableIteration<? extends Resource, SailException> getContextIDs()
 			throws SailException {
-		return new EmptyIteration<Resource, SailException>();
+		return new CloseableIteration<Resource, SailException>() {
+			private Iterator<Resource> ids = Arrays.asList(new Resource[]{vf.createURI("id:active")}).iterator();
+			@Override
+			public boolean hasNext() throws SailException {
+				// TODO Auto-generated method stub
+				return ids.hasNext();
+			}
+
+			@Override
+			public Resource next() throws SailException {
+				// TODO Auto-generated method stub
+				return ids.next();
+			}
+
+			@Override
+			public void remove() throws SailException {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void close() throws SailException {
+				// TODO Auto-generated method stub
+				
+			}
+		};
 	}
 
 	@Override

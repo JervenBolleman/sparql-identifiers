@@ -3,6 +3,7 @@ package ch.isbsib.sparql.identifiers;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -30,7 +31,7 @@ import org.openrdf.sail.SailException;
 public class IdentifiersOrgTripleSourceTest extends TestCase {
 	private final class RegistryDaoMock extends RegistryDao {
 		@Override
-		public List<URIextended> getSameAsURIs(String uri) {
+		public List<URIextended> getSameAsURIs(String uri, Boolean activeFlag) {
 			List<URIextended> urls = null;
 			urls = new ArrayList<URIextended>();
 			if (uri.equals("http://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0006915")) {
@@ -50,8 +51,8 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 				urls.add(new URIextended(
 						"http://amigo2.berkeleybop.org/cgi-bin/amigo2/amigo/term/GO:0006915",
 						0));
-				urls.add(new URIextended(
-						"http://purl.uniprot.org/go/0006915", 0));
+				urls.add(new URIextended("http://purl.uniprot.org/go/0006915",
+						0));
 				urls.add(new URIextended("http://bio2rdf.org/GO:0006915", 0));
 				urls.add(new URIextended(
 						"http://identifiers.org/go/GO:0006915", 0));
@@ -77,6 +78,22 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 						"http://www.ncbi.nlm.nih.gov/protein/P05067", 0));
 				urls.add(new URIextended(
 						"http://identifiers.org/uniprot/P05067", 0));
+			}
+			if (Boolean.TRUE == activeFlag) {
+				for (Iterator<URIextended> iterator = urls.iterator(); iterator
+						.hasNext();) {
+					URIextended e = iterator.next();
+					if (e.isObsolete())
+						iterator.remove();
+				}
+			}
+			if (Boolean.FALSE == activeFlag) {
+				for (Iterator<URIextended> iterator = urls.iterator(); iterator
+						.hasNext();) {
+					URIextended e = iterator.next();
+					if (!e.isObsolete())
+						iterator.remove();
+				}
 			}
 			return urls;
 		}
@@ -228,7 +245,69 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 			final BindingSet next = eval.next();
 			assertNotNull(next);
 			System.err.println(next.getBinding("target").getValue().toString());
-			assertTrue("Expect one more answer",next.getBinding("target").getValue().toString()
+			assertTrue("Expect one more answer", next.getBinding("target")
+					.getValue().toString().endsWith("0006915"));
+		}
+		assertFalse(eval.hasNext());
+	}
+	
+	
+	String query6 = "PREFIX "
+			+ OWL.PREFIX
+			+ ": <"
+			+ OWL.NAMESPACE
+			+ ">\n SELECT ?target \n"
+			+ "FROM <id:active> "
+			+ "WHERE {<http://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0006915> owl:sameAs ?target}";
+	String query7 = "PREFIX "
+			+ OWL.PREFIX
+			+ ": <"
+			+ OWL.NAMESPACE
+			+ ">\n SELECT ?target \n"
+			+ "WHERE {GRAPH <id:active> {<http://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0006915> owl:sameAs ?target}}";
+	@Test
+	public void testActiveGraph() throws IOException,
+			QueryEvaluationException, MalformedQueryException,
+			RepositoryException, SailException {
+
+		IdentifiersOrgStore rep = new IdentifiersOrgStore();
+		rep.setDao(new RegistryDaoMock());
+		rep.setDataDir(dataDir);
+		rep.setValueFactory(new ValueFactoryImpl());
+		SailRepository sr = new SailRepository(rep);
+		rep.initialize();
+		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
+				QueryLanguage.SPARQL, query6);
+		TupleQueryResult eval = pTQ.evaluate();
+		for (int i = 0; i < 12; i++) {
+			// for (int i = 0; i < 10; i++) {
+			assertTrue(eval.hasNext());
+			final BindingSet next = eval.next();
+			assertNotNull(next);
+			assertTrue(next.getBinding("target").getValue().toString()
+					.endsWith("0006915"));
+		}
+		pTQ = sr.getConnection().prepareTupleQuery(
+				QueryLanguage.SPARQL, query7);
+		eval = pTQ.evaluate();
+		for (int i = 0; i < 12; i++) {
+			// for (int i = 0; i < 10; i++) {
+			assertTrue(eval.hasNext());
+			final BindingSet next = eval.next();
+			assertNotNull(next);
+			assertTrue(next.getBinding("target").getValue().toString()
+					.endsWith("0006915"));
+		}
+		assertFalse(eval.hasNext());
+		pTQ = sr.getConnection().prepareTupleQuery(
+				QueryLanguage.SPARQL, query1);
+		eval = pTQ.evaluate();
+		for (int i = 0; i < 13; i++) {
+			// for (int i = 0; i < 10; i++) {
+			assertTrue(eval.hasNext());
+			final BindingSet next = eval.next();
+			assertNotNull(next);
+			assertTrue(next.getBinding("target").getValue().toString()
 					.endsWith("0006915"));
 		}
 		assertFalse(eval.hasNext());

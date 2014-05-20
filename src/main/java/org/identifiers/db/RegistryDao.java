@@ -27,13 +27,14 @@ public class RegistryDao {
 	 * Returns all URIs sameAs the provided one.
 	 * 
 	 * @param uri
+	 * @param activeflag 
 	 * @return
 	 */
-	public List<URIextended> getSameAsURIs(String uri) {
+	public List<URIextended> getSameAsURIs(String uri, Boolean activeflag) {
 
 		// initialisation of the database connection
 		try (Connection connection = DbUtilities.initDbConnection()) {
-			return fetchUrisFromConnection(connection, uri);
+			return fetchUrisFromConnection(connection, uri, activeflag);
 		} catch (SQLException e1) {
 			throw new RuntimeException(
 					"Sorry, an error occurred while dealing with your request.",
@@ -42,11 +43,16 @@ public class RegistryDao {
 	}
 
 	private List<URIextended> fetchUrisFromConnection(Connection connection,
-			String uri) throws SQLException {
+			String uri, Boolean activeflag) throws SQLException {
 		List<URIextended> urls = new ArrayList<URIextended>();
 		final String uriTobe = uri.substring(0, uri.lastIndexOf("/") + 1) + '%';
 
-		try (PreparedStatement stmt = connection.prepareStatement(QUERY)) {
+		String query = QUERY;
+		if (Boolean.TRUE.equals(activeflag))
+			query=query+" AND obsolete=0"; 
+		if (Boolean.FALSE.equals(activeflag))
+			query=query+" AND obsolete=1";
+		try (PreparedStatement stmt = connection.prepareStatement(query)) {
 			stmt.setString(1, uriTobe);
 			stmt.setString(2, uriTobe);
 			try (ResultSet rs = stmt.executeQuery()) {

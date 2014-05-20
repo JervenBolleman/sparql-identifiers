@@ -72,8 +72,9 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 
 	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj,
 			Resource... contexts) {
-		final Iterator<URIextended> iter = dao
-				.getSameAsURIs(subj.stringValue()).iterator();
+		Boolean activeflag = getActiveFlag(contexts);
+		final Iterator<URIextended> iter = dao.getSameAsURIs(
+				subj.stringValue(), activeflag).iterator();
 
 		return new Iterator<StatementImpl>() {
 
@@ -99,9 +100,10 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj,
 			final Resource obj, Resource... contexts) {
 
+		Boolean activeflag = getActiveFlag(contexts);
 		if (subj == null) {
 			final Iterator<URIextended> iter = dao.getSameAsURIs(
-					obj.stringValue()).iterator();
+					obj.stringValue(), activeflag).iterator();
 			return new Iterator<StatementImpl>() {
 
 				@Override
@@ -123,7 +125,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			};
 		} else {
 			final Iterator<URIextended> iter = dao.getSameAsURIs(
-					obj.stringValue()).iterator();
+					obj.stringValue(), activeflag).iterator();
 			List<StatementImpl> l = new ArrayList<>(1);
 			while (iter.hasNext()) {
 				final URIextended next = iter.next();
@@ -133,6 +135,16 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			}
 			return l.iterator();
 		}
+	}
+
+	private Boolean getActiveFlag(Resource... contexts) {
+		for (Resource context : contexts) {
+			if (vf.createURI("id:active").equals(context))
+				return Boolean.TRUE;
+			if (vf.createURI("id:obsolete").equals(context))
+				return Boolean.FALSE;
+		}
+		return null;
 	}
 
 	@Override
