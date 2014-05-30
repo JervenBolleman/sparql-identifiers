@@ -1,4 +1,4 @@
-The SPARQL-bed software is licensed to you by the SIB Swiss Institute of Bioinformatics under the GNU Affero general public license v3. If this is not appropiate for your use case please contact Genebio at http://genebio.com/contact/index.html for different license options.                     
+The SPARQL-identifiers  software is licensed to you by the SIB Swiss Institute of Bioinformatics under the GNU Affero general public license v3. If this is not appropiate for your use case please contact Genebio at http://genebio.com/contact/index.html for different license options.                     
 
 
 		    GNU AFFERO GENERAL PUBLIC LICENSE
