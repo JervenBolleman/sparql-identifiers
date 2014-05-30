@@ -1,7 +1,7 @@
 sparql-identifiers
 ==================
 
-sparql for identifiers.org to convert possible URI patternssimple by having a virtual triple store.
+sparql for identifiers.org to convert possible URI patterns simply by having a virtual triple store.
 
 ```
 git clone https://github.com/JervenBolleman/sparql-identifiers
@@ -11,4 +11,4 @@ mvn assembly:assembly
 ```
 
 See the issue lists for future tasks..
-The only requirements are a maven3 and java6+ installation.
+The only requirements are a maven3 and java7+ installation.
