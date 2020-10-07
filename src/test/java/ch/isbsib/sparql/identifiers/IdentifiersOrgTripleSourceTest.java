@@ -6,8 +6,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.vocabulary.OWL;
+import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.BooleanQuery;
+import org.eclipse.rdf4j.query.MalformedQueryException;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.query.TupleQuery;
+import org.eclipse.rdf4j.query.TupleQueryResult;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.sail.SailException;
 import org.identifiers.data.URIextended;
 import org.identifiers.db.RegistryDao;
 import org.junit.After;
@@ -15,18 +25,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.BooleanQuery;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.SailException;
+
+import junit.framework.TestCase;
 
 public class IdentifiersOrgTripleSourceTest extends TestCase {
 	private final class RegistryDaoMock extends RegistryDao {
@@ -101,10 +101,10 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
-	private File dataDir = null;
+	private File dataDir;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws IOException {
 		dataDir = folder.newFolder("data.dir");
 	}
 
@@ -127,7 +127,7 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 		IdentifiersOrgStore rep = new IdentifiersOrgStore();
 		rep.setDao(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(new ValueFactoryImpl());
+		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
@@ -157,7 +157,7 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 			RepositoryException, SailException {
 		IdentifiersOrgStore rep = new IdentifiersOrgStore();
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(new ValueFactoryImpl());
+		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
@@ -180,7 +180,7 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 		IdentifiersOrgStore rep = new IdentifiersOrgStore();
 		rep.setDao(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(new ValueFactoryImpl());
+		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
@@ -210,7 +210,7 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 		IdentifiersOrgStore rep = new IdentifiersOrgStore();
 		rep.setDao(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(new ValueFactoryImpl());
+		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		BooleanQuery pTQ = sr.getConnection().prepareBooleanQuery(
@@ -234,7 +234,7 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 		IdentifiersOrgStore rep = new IdentifiersOrgStore();
 		rep.setDao(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(new ValueFactoryImpl());
+		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(
@@ -273,7 +273,7 @@ public class IdentifiersOrgTripleSourceTest extends TestCase {
 		IdentifiersOrgStore rep = new IdentifiersOrgStore();
 		rep.setDao(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(new ValueFactoryImpl());
+		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(

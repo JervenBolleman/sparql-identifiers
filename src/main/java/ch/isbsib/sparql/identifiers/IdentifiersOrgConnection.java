@@ -1,47 +1,48 @@
 package ch.isbsib.sparql.identifiers;
 
-import info.aduna.iteration.CloseableIteration;
-import info.aduna.iteration.CloseableIteratorIteration;
-import info.aduna.iteration.EmptyIteration;
-
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
+import org.eclipse.rdf4j.IsolationLevel;
+import org.eclipse.rdf4j.common.iteration.CloseableIteration;
+import org.eclipse.rdf4j.common.iteration.CloseableIteratorIteration;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Namespace;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleNamespace;
+import org.eclipse.rdf4j.model.vocabulary.OWL;
+import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.Dataset;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.query.algebra.TupleExpr;
+import org.eclipse.rdf4j.query.algebra.evaluation.EvaluationStrategy;
+import org.eclipse.rdf4j.query.algebra.evaluation.impl.BindingAssigner;
+import org.eclipse.rdf4j.query.algebra.evaluation.impl.FilterOptimizer;
+import org.eclipse.rdf4j.query.algebra.evaluation.impl.StrictEvaluationStrategy;
+import org.eclipse.rdf4j.query.impl.EmptyBindingSet;
+import org.eclipse.rdf4j.repository.sparql.federation.SPARQLServiceResolver;
+import org.eclipse.rdf4j.sail.SailConnection;
+import org.eclipse.rdf4j.sail.SailException;
+import org.eclipse.rdf4j.sail.UnknownSailTransactionStateException;
+import org.eclipse.rdf4j.sail.UpdateContext;
+//import org.eclipse.rdf4j.sail.UnknownSailTransactionStateException;
+//import org.eclipse.rdf4j.sail.UpdateContext;
 import org.identifiers.db.RegistryDao;
-import org.openrdf.model.Namespace;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.NamespaceImpl;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.Dataset;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.algebra.TupleExpr;
-import org.openrdf.query.algebra.evaluation.EvaluationStrategy;
-import org.openrdf.query.algebra.evaluation.impl.BindingAssigner;
-import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
-import org.openrdf.query.algebra.evaluation.impl.FilterOptimizer;
-import org.openrdf.query.impl.EmptyBindingSet;
-import org.openrdf.sail.SailConnection;
-import org.openrdf.sail.SailException;
-import org.openrdf.sail.UnknownSailTransactionStateException;
-import org.openrdf.sail.UpdateContext;
-//import org.openrdf.sail.UnknownSailTransactionStateException;
-//import org.openrdf.sail.UpdateContext;
 
 public class IdentifiersOrgConnection implements SailConnection {
 	private final ValueFactory vf;
 
 	private final RegistryDao dao;
+
+	private SPARQLServiceResolver fd;
 	public IdentifiersOrgConnection(ValueFactory vf, RegistryDao dao) {
 		super();
 		this.vf = vf;
 		this.dao = dao;
+		this.fd = new SPARQLServiceResolver();
 	}
 
 	@Override
@@ -61,7 +62,7 @@ public class IdentifiersOrgConnection implements SailConnection {
 		try {
 			
 			IdentifiersOrgTripleSource tripleSource = new IdentifiersOrgTripleSource(vf, dao);
-			EvaluationStrategy strategy = new EvaluationStrategyImpl(tripleSource);
+			EvaluationStrategy strategy = new StrictEvaluationStrategy(tripleSource, fd);
 			tupleExpr = tupleExpr.clone();
 			new BindingAssigner().optimize(tupleExpr, dataset, bindings);
 
@@ -76,7 +77,7 @@ public class IdentifiersOrgConnection implements SailConnection {
 	public CloseableIteration<? extends Resource, SailException> getContextIDs()
 			throws SailException {
 		return new CloseableIteration<Resource, SailException>() {
-			private Iterator<Resource> ids = Arrays.asList(new Resource[]{vf.createURI("id:active")}).iterator();
+			private Iterator<Resource> ids = Arrays.asList(new Resource[]{vf.createIRI("id:active")}).iterator();
 			@Override
 			public boolean hasNext() throws SailException {
 				// TODO Auto-generated method stub
@@ -105,10 +106,10 @@ public class IdentifiersOrgConnection implements SailConnection {
 
 	@Override
 	public CloseableIteration<? extends Statement, SailException> getStatements(
-			Resource subj, URI pred, Value obj, boolean includeInferred,
+			Resource subj, IRI pred, Value obj, boolean includeInferred,
 			Resource... contexts) throws SailException {
 
-	    final CloseableIteration<StatementImpl, QueryEvaluationException> bedFileFilterReader;
+	    final CloseableIteration<Statement, QueryEvaluationException> bedFileFilterReader;
 		try {
 			bedFileFilterReader = new IdentifiersOrgTripleSource(vf, dao).getStatements(subj, pred, obj, contexts);
 		} catch (QueryEvaluationException e1) {
@@ -171,14 +172,14 @@ public class IdentifiersOrgConnection implements SailConnection {
 	// }
 
 	@Override
-	public void addStatement(Resource subj, URI pred, Value obj,
+	public void addStatement(Resource subj, IRI pred, Value obj,
 			Resource... contexts) throws SailException {
 		throw new SailException("Identifiers files can not be updated via SPARQL");
 
 	}
 
 	@Override
-	public void removeStatements(Resource subj, URI pred, Value obj,
+	public void removeStatements(Resource subj, IRI pred, Value obj,
 			Resource... contexts) throws SailException {
 		throw new SailException("Identifiers files can not be updated via SPARQL");
 
@@ -198,7 +199,7 @@ public class IdentifiersOrgConnection implements SailConnection {
 		return new CloseableIteratorIteration<Namespace, SailException>() {
 			private Iterator<Namespace> namespaces = Arrays.asList(
 					new Namespace[] {
-							new NamespaceImpl(OWL.PREFIX, OWL.NAMESPACE)
+							new SimpleNamespace(OWL.PREFIX, OWL.NAMESPACE)
 							//TODO list all supported namespaces from the file 
 							})
 					.iterator();
@@ -241,7 +242,7 @@ public class IdentifiersOrgConnection implements SailConnection {
 	}
 
 	@Override
-	public void addStatement(UpdateContext arg0, Resource arg1, URI arg2,
+	public void addStatement(UpdateContext arg0, Resource arg1, IRI arg2,
 			Value arg3, Resource... arg4) throws SailException {
 		throw new SailException("Identifiers.org can not be updated via SPARQL");
 	}
@@ -269,7 +270,7 @@ public class IdentifiersOrgConnection implements SailConnection {
 	}
 
 	@Override
-	public void removeStatement(UpdateContext arg0, Resource arg1, URI arg2,
+	public void removeStatement(UpdateContext arg0, Resource arg1, IRI arg2,
 			Value arg3, Resource... arg4) throws SailException {
 		throw new SailException("Identifiers.org can not be updated via SPARQL");
 	}
@@ -277,6 +278,29 @@ public class IdentifiersOrgConnection implements SailConnection {
 	@Override
 	public void startUpdate(UpdateContext arg0) throws SailException {
 		throw new SailException("Identifiers.org can not be updated via SPARQL");
+	}
+
+	@Override
+	public void begin(IsolationLevel level)
+	    throws UnknownSailTransactionStateException, SailException
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void flush()
+	    throws SailException
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean pendingRemovals()
+	{
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

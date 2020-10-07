@@ -1,22 +1,22 @@
 package ch.isbsib.sparql.identifiers;
 
-import info.aduna.iteration.CloseableIteration;
-import info.aduna.iteration.EmptyIteration;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.rdf4j.common.iteration.CloseableIteration;
+import org.eclipse.rdf4j.common.iteration.EmptyIteration;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+import org.eclipse.rdf4j.model.vocabulary.OWL;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.query.algebra.evaluation.TripleSource;
 import org.identifiers.data.URIextended;
 import org.identifiers.db.RegistryDao;
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.algebra.evaluation.TripleSource;
 
 public class IdentifiersOrgTripleSource implements TripleSource {
 
@@ -29,15 +29,15 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 	}
 
 	@Override
-	public CloseableIteration<StatementImpl, QueryEvaluationException> getStatements(
-			Resource subj, URI pred, Value obj, Resource... contexts)
+	public CloseableIteration<Statement, QueryEvaluationException> getStatements(
+			Resource subj, IRI pred, Value obj, Resource... contexts)
 			throws QueryEvaluationException {
 		if (!pred.equals(OWL.SAMEAS))
-			return new EmptyIteration<StatementImpl, QueryEvaluationException>();
+			return new EmptyIteration<Statement, QueryEvaluationException>();
 		if (subj == null && obj == null)
-			return new EmptyIteration<StatementImpl, QueryEvaluationException>();
-		final Iterator<StatementImpl> iter = getIterViaJDBC(subj, obj, contexts);
-		return new CloseableIteration<StatementImpl, QueryEvaluationException>() {
+			return new EmptyIteration<Statement, QueryEvaluationException>();
+		final Iterator<Statement> iter = getIterViaJDBC(subj, obj, contexts);
+		return new CloseableIteration<Statement, QueryEvaluationException>() {
 
 			@Override
 			public boolean hasNext() throws QueryEvaluationException {
@@ -45,7 +45,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			}
 
 			@Override
-			public StatementImpl next() throws QueryEvaluationException {
+			public Statement next() throws QueryEvaluationException {
 				return iter.next();
 			}
 
@@ -62,7 +62,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 		};
 	}
 
-	private Iterator<StatementImpl> getIterViaJDBC(Resource subj, Value obj,
+	private Iterator<Statement> getIterViaJDBC(Resource subj, Value obj,
 			Resource... contexts) {
 		if (obj instanceof Resource) {
 			return getResultsViaJDBC(subj, (Resource) obj, contexts);
@@ -70,13 +70,13 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			return getResultsViaJDBC(subj, contexts);
 	}
 
-	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj,
+	private Iterator<Statement> getResultsViaJDBC(final Resource subj,
 			Resource... contexts) {
 		Boolean activeflag = getActiveFlag(contexts);
 		final Iterator<URIextended> iter = dao.getSameAsURIs(
 				subj.stringValue(), activeflag).iterator();
 
-		return new Iterator<StatementImpl>() {
+		return new Iterator<Statement>() {
 
 			@Override
 			public boolean hasNext() {
@@ -84,10 +84,10 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			}
 
 			@Override
-			public StatementImpl next() {
+			public Statement next() {
 				final URIextended next = iter.next();
-				URI uri = vf.createURI(next.getURI());
-				return new StatementImpl(subj, OWL.SAMEAS, uri);
+				IRI uri = vf.createIRI(next.getURI());
+				return SimpleValueFactory.getInstance().createStatement(subj, OWL.SAMEAS, uri);
 			}
 
 			@Override
@@ -97,14 +97,14 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 		};
 	}
 
-	private Iterator<StatementImpl> getResultsViaJDBC(final Resource subj,
+	private Iterator<Statement> getResultsViaJDBC(final Resource subj,
 			final Resource obj, Resource... contexts) {
 
 		Boolean activeflag = getActiveFlag(contexts);
 		if (subj == null) {
 			final Iterator<URIextended> iter = dao.getSameAsURIs(
 					obj.stringValue(), activeflag).iterator();
-			return new Iterator<StatementImpl>() {
+			return new Iterator<Statement>() {
 
 				@Override
 				public boolean hasNext() {
@@ -112,10 +112,10 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 				}
 
 				@Override
-				public StatementImpl next() {
+				public Statement next() {
 					final URIextended next = iter.next();
-					URI uri = vf.createURI(next.getURI());
-					return new StatementImpl(subj, OWL.SAMEAS, uri);
+					IRI uri = vf.createIRI(next.getURI());
+					return SimpleValueFactory.getInstance().createStatement(subj, OWL.SAMEAS, uri);
 				}
 
 				@Override
@@ -126,11 +126,11 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 		} else {
 			final Iterator<URIextended> iter = dao.getSameAsURIs(
 					obj.stringValue(), activeflag).iterator();
-			List<StatementImpl> l = new ArrayList<>(1);
+			List<Statement> l = new ArrayList<>(1);
 			while (iter.hasNext()) {
 				final URIextended next = iter.next();
 				if (subj.stringValue().equals(next.getURI())) {
-					l.add(new StatementImpl(subj, OWL.SAMEAS, obj));
+					l.add(SimpleValueFactory.getInstance().createStatement(subj, OWL.SAMEAS, obj));
 				}
 			}
 			return l.iterator();
@@ -139,9 +139,9 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 
 	private Boolean getActiveFlag(Resource... contexts) {
 		for (Resource context : contexts) {
-			if (vf.createURI("id:active").equals(context))
+			if (vf.createIRI("id:active").equals(context))
 				return Boolean.TRUE;
-			if (vf.createURI("id:obsolete").equals(context))
+			if (vf.createIRI("id:obsolete").equals(context))
 				return Boolean.FALSE;
 		}
 		return null;

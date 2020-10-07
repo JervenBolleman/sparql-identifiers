@@ -7,11 +7,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.identifiers.db.RegistryDao;
-import org.openrdf.model.Resource;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.sail.SailConnection;
-import org.openrdf.sail.SailException;
-import org.openrdf.sail.helpers.SailBase;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.sail.SailConnection;
+import org.eclipse.rdf4j.sail.SailException;
+import org.eclipse.rdf4j.sail.helpers.SailBase;
 
 public class IdentifiersOrgStore extends SailBase {
 	private ValueFactory vf;

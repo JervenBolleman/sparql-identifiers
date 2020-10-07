@@ -1,27 +1,26 @@
 package ch.isbsib.sparql.identifiers;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.query.BooleanQuery;
-import org.openrdf.query.GraphQuery;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.Query;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResultHandlerException;
-import org.openrdf.query.resultio.BooleanQueryResultFormat;
-import org.openrdf.query.resultio.BooleanQueryResultWriter;
-import org.openrdf.query.resultio.QueryResultIO;
-import org.openrdf.query.resultio.text.csv.SPARQLResultsCSVWriter;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.rio.RDFHandler;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.turtle.TurtleWriter;
-import org.openrdf.sail.SailException;
+import org.eclipse.rdf4j.model.impl.ValueFactoryImpl;
+import org.eclipse.rdf4j.query.BooleanQuery;
+import org.eclipse.rdf4j.query.GraphQuery;
+import org.eclipse.rdf4j.query.MalformedQueryException;
+import org.eclipse.rdf4j.query.Query;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.query.TupleQuery;
+import org.eclipse.rdf4j.query.TupleQueryResultHandlerException;
+import org.eclipse.rdf4j.query.resultio.BooleanQueryResultFormat;
+import org.eclipse.rdf4j.query.resultio.QueryResultIO;
+import org.eclipse.rdf4j.query.resultio.QueryResultWriter;
+import org.eclipse.rdf4j.query.resultio.text.csv.SPARQLResultsCSVWriter;
+import org.eclipse.rdf4j.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.sail.SailRepository;
+import org.eclipse.rdf4j.rio.RDFHandler;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
+import org.eclipse.rdf4j.rio.turtle.TurtleWriter;
+import org.eclipse.rdf4j.sail.SailException;
 
 public class CLI {
 	public static void main(String[] args)  {
@@ -47,16 +46,16 @@ public class CLI {
 				RDFHandler createWriter = new TurtleWriter(System.out);
 				((GraphQuery) pTQ).evaluate(createWriter);
 			} else if (pTQ instanceof BooleanQuery) {
-				BooleanQueryResultWriter createWriter = QueryResultIO
+				QueryResultWriter createWriter = QueryResultIO
 						.createWriter(BooleanQueryResultFormat.TEXT, System.out);
 				boolean evaluate = ((BooleanQuery) pTQ).evaluate();
-				createWriter.write(evaluate);
+				createWriter.handleBoolean(evaluate);
 			}
 			System.err.println("done");
 		} catch (MalformedQueryException e){
 			System.err.println("Query syntax is broken");
 			System.exit(2);
-		} catch (SailException | IOException | QueryEvaluationException | RDFHandlerException | TupleQueryResultHandlerException  | RepositoryException e) {
+		} catch (SailException  | QueryEvaluationException | RDFHandlerException | TupleQueryResultHandlerException  | RepositoryException e) {
 			System.err.println("failed in sesame code");
 			System.exit(1);
 		} finally {
