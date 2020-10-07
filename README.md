@@ -11,4 +11,4 @@ mvn assembly:assembly
 ```
 
 See the issue lists for future tasks..
-The only requirements are a maven3 and java7+ installation.
+The only requirements are a maven3 and java11+ installation.
