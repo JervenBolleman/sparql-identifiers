@@ -1,5 +1,9 @@
 package ch.isbsib.sparql.identifiers;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,9 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import junit.framework.TestCase;
-
-public class IdentifiersOrgTripleSourceTest extends TestCase {
+public class IdentifiersOrgTripleSourceTest {
 	private final class RegistryDaoMock extends RegistryDao {
 		@Override
 		public List<URIextended> getSameAsURIs(String uri, Boolean activeFlag) {
