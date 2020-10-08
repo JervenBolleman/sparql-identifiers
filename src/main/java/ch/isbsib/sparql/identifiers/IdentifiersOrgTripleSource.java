@@ -11,19 +11,18 @@ import org.eclipse.rdf4j.model.Resource;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.query.algebra.evaluation.TripleSource;
 import org.identifiers.data.URIextended;
-import org.identifiers.db.RegistryDao;
+import org.identifiers.db.Dao;
 
 public class IdentifiersOrgTripleSource implements TripleSource {
 
 	private final ValueFactory vf;
-	private final RegistryDao dao;
+	private final Dao dao;
 
-	public IdentifiersOrgTripleSource(ValueFactory vf, RegistryDao dao) {
+	public IdentifiersOrgTripleSource(ValueFactory vf, Dao dao) {
 		this.vf = vf;
 		this.dao = dao;
 	}
@@ -36,7 +35,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			return new EmptyIteration<Statement, QueryEvaluationException>();
 		if (subj == null && obj == null)
 			return new EmptyIteration<Statement, QueryEvaluationException>();
-		final Iterator<Statement> iter = getIterViaJDBC(subj, obj, contexts);
+		final Iterator<Statement> iter = getIterViaDao(subj, obj, contexts);
 		return new CloseableIteration<Statement, QueryEvaluationException>() {
 
 			@Override
@@ -62,19 +61,20 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 		};
 	}
 
-	private Iterator<Statement> getIterViaJDBC(Resource subj, Value obj,
+	private Iterator<Statement> getIterViaDao(Resource subj, Value obj,
 			Resource... contexts) {
 		if (obj instanceof Resource) {
-			return getResultsViaJDBC(subj, (Resource) obj, contexts);
+			return getResultsViaDao(subj, (Resource) obj, contexts);
 		} else
-			return getResultsViaJDBC(subj, contexts);
+			return getResultsViaDao(subj, contexts);
 	}
 
-	private Iterator<Statement> getResultsViaJDBC(final Resource subj,
+	private Iterator<Statement> getResultsViaDao(final Resource subj,
 			Resource... contexts) {
 		Boolean activeflag = getActiveFlag(contexts);
-		final Iterator<URIextended> iter = dao.getSameAsURIs(
-				subj.stringValue(), activeflag).iterator();
+		final String stringValue = subj.stringValue();
+		final List<URIextended> sameAsURIs = dao.getSameAsURIs(stringValue, activeflag);
+		final Iterator<URIextended> iter = sameAsURIs.iterator();
 
 		return new Iterator<Statement>() {
 
@@ -86,8 +86,8 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			@Override
 			public Statement next() {
 				final URIextended next = iter.next();
-				IRI uri = vf.createIRI(next.getURI());
-				return SimpleValueFactory.getInstance().createStatement(subj, OWL.SAMEAS, uri);
+				IRI uri = vf.createIRI(next.getUri());
+				return vf.createStatement(subj, OWL.SAMEAS, uri);
 			}
 
 			@Override
@@ -97,7 +97,7 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 		};
 	}
 
-	private Iterator<Statement> getResultsViaJDBC(final Resource subj,
+	private Iterator<Statement> getResultsViaDao(final Resource subj,
 			final Resource obj, Resource... contexts) {
 
 		Boolean activeflag = getActiveFlag(contexts);
@@ -114,8 +114,8 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 				@Override
 				public Statement next() {
 					final URIextended next = iter.next();
-					IRI uri = vf.createIRI(next.getURI());
-					return SimpleValueFactory.getInstance().createStatement(subj, OWL.SAMEAS, uri);
+					IRI uri = vf.createIRI(next.getUri());
+					return vf.createStatement(subj, OWL.SAMEAS, uri);
 				}
 
 				@Override
@@ -129,8 +129,8 @@ public class IdentifiersOrgTripleSource implements TripleSource {
 			List<Statement> l = new ArrayList<>(1);
 			while (iter.hasNext()) {
 				final URIextended next = iter.next();
-				if (subj.stringValue().equals(next.getURI())) {
-					l.add(SimpleValueFactory.getInstance().createStatement(subj, OWL.SAMEAS, obj));
+				if (subj.stringValue().equals(next.getUri())) {
+					l.add(vf.createStatement(subj, OWL.SAMEAS, obj));
 				}
 			}
 			return l.iterator();

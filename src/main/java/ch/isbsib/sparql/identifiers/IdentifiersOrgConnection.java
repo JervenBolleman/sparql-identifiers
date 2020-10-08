@@ -28,17 +28,15 @@ import org.eclipse.rdf4j.sail.SailConnection;
 import org.eclipse.rdf4j.sail.SailException;
 import org.eclipse.rdf4j.sail.UnknownSailTransactionStateException;
 import org.eclipse.rdf4j.sail.UpdateContext;
-//import org.eclipse.rdf4j.sail.UnknownSailTransactionStateException;
-//import org.eclipse.rdf4j.sail.UpdateContext;
-import org.identifiers.db.RegistryDao;
+import org.identifiers.db.Dao;
 
 public class IdentifiersOrgConnection implements SailConnection {
 	private final ValueFactory vf;
 
-	private final RegistryDao dao;
+	private final Dao dao;
 
 	private SPARQLServiceResolver fd;
-	public IdentifiersOrgConnection(ValueFactory vf, RegistryDao dao) {
+	public IdentifiersOrgConnection(ValueFactory vf, Dao dao) {
 		super();
 		this.vf = vf;
 		this.dao = dao;

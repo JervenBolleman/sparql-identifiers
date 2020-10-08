@@ -1,8 +1,5 @@
 package org.identifiers.db;
 
-import org.identifiers.data.URIextended;
-import org.identifiers.db.DbUtilities;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,13 +7,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.identifiers.data.URIextended;
+
 /**
  * Simple dao for SPARQL testing.
  * 
  * @author Camille
  * @version 20140519
  */
-public class RegistryDao {
+public class RegistryDao implements Dao {
 
 	private static final String QUERY = "SELECT convertPrefix, obsolete "
 			+ ", ( SELECT convertPrefix FROM mir_resource WHERE convertPrefix LIKE ? LIMIT 1 ORDER BY size(convertPrefix)) AS original_prefix "
@@ -30,6 +29,7 @@ public class RegistryDao {
 	 * @param activeflag 
 	 * @return
 	 */
+	@Override
 	public List<URIextended> getSameAsURIs(String uri, Boolean activeflag) {
 
 		// initialisation of the database connection
@@ -61,7 +61,7 @@ public class RegistryDao {
 							"original_prefix").length());
 					final String uri2 = rs.getString("convertPrefix")
 							+ identifier;
-					urls.add(new URIextended(uri2, rs.getInt("obsolete")));
+					urls.add(new URIextended(uri2, rs.getInt("obsolete") == 1));
 				}
 			}
 		}
