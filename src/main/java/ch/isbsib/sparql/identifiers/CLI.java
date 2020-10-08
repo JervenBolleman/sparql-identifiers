@@ -1,7 +1,6 @@
 package ch.isbsib.sparql.identifiers;
 
 import java.io.File;
-import java.net.URISyntaxException;
 
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.query.BooleanQuery;
@@ -25,7 +24,7 @@ import org.eclipse.rdf4j.sail.SailException;
 import org.identifiers.api.ApiDao;
 
 public class CLI {
-    public static void main(String[] args) throws URISyntaxException {
+    public static void main(String[] args) {
 	IdentifiersOrgStore rep = new IdentifiersOrgStore(new ApiDao());
 	File dataDir = mkTempDir();
 	if (args[0] == null) {

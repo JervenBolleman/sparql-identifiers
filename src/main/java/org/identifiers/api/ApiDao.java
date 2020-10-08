@@ -25,9 +25,13 @@ public class ApiDao implements Dao {
     private final URI uri;
     private volatile List<PrefixPatterns> prefixPatterns;
 
-    public ApiDao() throws URISyntaxException {
+    public ApiDao() {
 	super();
-	uri = new URI("https://registry.api.identifiers.org/resolutionApi/getResolverDataset");
+	try {
+	    uri = new URI("https://registry.api.identifiers.org/resolutionApi/getResolverDataset");
+	} catch (URISyntaxException e) {
+	    throw new IllegalStateException(e);
+	}
 	update();
     }
 
@@ -94,7 +98,7 @@ public class ApiDao implements Dao {
 		final String afterId = beforeAndAfterId.afterId;
 		if (uri.startsWith(beforeId) && uri.endsWith(afterId)) {
 		    String id = uri.substring(beforeId.length(), uri.length() - afterId.length());
-		    if (patterns.idPattern.matcher(id).matches()) {
+		    if (patterns.idPattern == null || patterns.idPattern.matcher(id).matches()) {
 			addAll(extended, id, patterns.beforeAndAfterId, uri, activeflag);
 		    }
 		}
@@ -107,7 +111,7 @@ public class ApiDao implements Dao {
 	    Boolean activeflag) {
 	for (BeforeAfterActive beforeAndAfterId : beforeAndAfterIds) {
 	    String newUrl = beforeAndAfterId.beforeId + id + beforeAndAfterId.afterId;
-	    if (!uri.equals(newUrl) && (activeflag ==null || activeflag == beforeAndAfterId.active))
+	    if (!uri.equals(newUrl) && (activeflag == null || activeflag == beforeAndAfterId.active))
 		extended.add(new URIextended(newUrl, !activeflag));
 	}
     }
@@ -117,7 +121,10 @@ public class ApiDao implements Dao {
 	private final List<BeforeAfterActive> beforeAndAfterId = new ArrayList<>();
 
 	public PrefixPatterns(String idPattern) {
-	    this.idPattern = Pattern.compile(idPattern);
+	    if (idPattern != null && !idPattern.isBlank())
+		this.idPattern = Pattern.compile(idPattern);
+	    else
+		this.idPattern = null;
 	}
 
 	public void add(String beforeId, String afterId, boolean active) {
