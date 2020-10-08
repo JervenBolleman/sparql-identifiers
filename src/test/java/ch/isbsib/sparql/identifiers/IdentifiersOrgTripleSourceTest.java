@@ -23,7 +23,7 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.sail.SailException;
 import org.identifiers.data.URIextended;
-import org.identifiers.db.RegistryDao;
+import org.identifiers.db.Dao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class IdentifiersOrgTripleSourceTest {
-    private final class RegistryDaoMock extends RegistryDao {
+    private final class RegistryDaoMock implements Dao {
 	@Override
 	public List<URIextended> getSameAsURIs(String uri, Boolean activeFlag) {
 	    List<URIextended> urls = new ArrayList<URIextended>();
