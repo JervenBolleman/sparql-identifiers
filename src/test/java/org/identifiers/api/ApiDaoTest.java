@@ -30,7 +30,6 @@ public class ApiDaoTest {
 	assertTrue(sameAsURIs.contains(new URIextended("https://identifiers.org/uniprot/P05067", true)));
     }
 
-    @Ignore
     @Test
     public void testChebi() throws URISyntaxException {
 
@@ -38,6 +37,6 @@ public class ApiDaoTest {
 	List<URIextended> sameAsURIs = apiDao.getSameAsURIs(in, true);
 	assertNotNull(sameAsURIs);
 	assertTrue(sameAsURIs
-		.contains(new URIextended("https://www.ebi.ac.uk/ols/ontologies/chebi/terms?obo_id=36927", false)));
+		.contains(new URIextended("https://www.ebi.ac.uk/ols/ontologies/chebi/terms?obo_id=CHEBI:36927", false)));
     }
 }
