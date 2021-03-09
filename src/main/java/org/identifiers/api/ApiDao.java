@@ -10,6 +10,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -38,10 +39,10 @@ public final class ApiDao implements Dao {
         }
         update();
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(new Updateor(), 10, 10, HOURS);
+        scheduler.scheduleAtFixedRate(new Updater(), 1, 1, HOURS);
     }
 
-    private class Updateor implements Runnable {
+    private class Updater implements Runnable {
 
         @Override
         public void run() {
@@ -177,4 +178,12 @@ public final class ApiDao implements Dao {
             return uri.substring(beforeId.length(), uri.length() - afterId.length());
         }
     }
+
+	public Iterator<String> iris() {
+		return prefixPatterns.stream()
+				.map(p -> p.beforeAndAfterId)
+				.flatMap(List::stream)
+				.map(baa -> baa.beforeId+"${id}"+baa.afterId)
+				.iterator();
+	}	
 }

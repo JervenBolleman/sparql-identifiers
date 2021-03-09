@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.BooleanQuery;
@@ -22,8 +21,8 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.sail.SailException;
-import org.identifiers.data.URIextended;
 import org.identifiers.api.ApiDao;
+import org.identifiers.data.URIextended;
 import org.identifiers.db.Dao;
 import org.junit.After;
 import org.junit.Before;
@@ -107,7 +106,6 @@ public class IdentifiersOrgTripleSourceTest {
 
 		IdentifiersOrgStore rep = new IdentifiersOrgStore(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query1);
@@ -131,7 +129,6 @@ public class IdentifiersOrgTripleSourceTest {
 			throws IOException, QueryEvaluationException, MalformedQueryException, RepositoryException, SailException {
 		IdentifiersOrgStore rep = new IdentifiersOrgStore(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query2);
@@ -148,7 +145,6 @@ public class IdentifiersOrgTripleSourceTest {
 
 		IdentifiersOrgStore rep = new IdentifiersOrgStore(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query3);
@@ -171,7 +167,6 @@ public class IdentifiersOrgTripleSourceTest {
 
 		IdentifiersOrgStore rep = new IdentifiersOrgStore(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		BooleanQuery pTQ = sr.getConnection().prepareBooleanQuery(QueryLanguage.SPARQL, query4);
@@ -189,7 +184,6 @@ public class IdentifiersOrgTripleSourceTest {
 
 		IdentifiersOrgStore rep = new IdentifiersOrgStore(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query5);
@@ -215,7 +209,6 @@ public class IdentifiersOrgTripleSourceTest {
 
 		IdentifiersOrgStore rep = new IdentifiersOrgStore(new RegistryDaoMock());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query6);
@@ -261,7 +254,6 @@ public class IdentifiersOrgTripleSourceTest {
 
 		IdentifiersOrgStore rep = new IdentifiersOrgStore(new ApiDao());
 		rep.setDataDir(dataDir);
-		rep.setValueFactory(SimpleValueFactory.getInstance());
 		SailRepository sr = new SailRepository(rep);
 		rep.initialize();
 		TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, queryChebi);

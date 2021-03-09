@@ -3,7 +3,6 @@ package ch.isbsib.sparql.identifiers;
 import java.io.File;
 import java.util.concurrent.Callable;
 
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.query.BooleanQuery;
 import org.eclipse.rdf4j.query.GraphQuery;
 import org.eclipse.rdf4j.query.MalformedQueryException;
@@ -23,6 +22,7 @@ import org.eclipse.rdf4j.rio.RDFHandlerException;
 import org.eclipse.rdf4j.rio.turtle.TurtleWriter;
 import org.eclipse.rdf4j.sail.SailException;
 import org.identifiers.api.ApiDao;
+
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -47,7 +47,6 @@ public class CLI implements Callable<Integer> {
         File dataDir = mkTempDir();
         try {
             rep.setDataDir(dataDir);
-            rep.setValueFactory(SimpleValueFactory.getInstance());
             SailRepository sr = new SailRepository(rep);
             rep.initialize();
             Query pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query);
