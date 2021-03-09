@@ -31,13 +31,13 @@ public class IdentifiersOrgTripleSource implements TripleSource {
     public CloseableIteration<Statement, QueryEvaluationException> getStatements(
             Resource subj, IRI pred, Value obj, Resource... contexts)
             throws QueryEvaluationException {
-        // Any predicate that is not OWL.SAMEAS is equivalent to an empty list
-        if (!pred.equals(OWL.SAMEAS)) {
-            return new EmptyIteration<>();
-        }
         // If both sides are variables we can't do a conversion so return 
         // nothing
         if (subj == null && obj == null) {
+            return new EmptyIteration<>();
+        }
+        // Any predicate that is not OWL.SAMEAS is equivalent to an empty list
+        if (!OWL.SAMEAS.equals(pred)) {
             return new EmptyIteration<>();
         }
         final Iterator<Statement> iter = getIterViaDao(subj, obj, contexts);
