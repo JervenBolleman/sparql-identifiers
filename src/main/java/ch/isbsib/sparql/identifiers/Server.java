@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class Server {
 	private static Logger logger = LoggerFactory.getLogger(Server.class);
 
-	@Bean
+	@Bean(destroyMethod = "shutDown")
 	public Repository getRepository() {
 		logger.info("Starting dao");
 		ApiDao dao = new ApiDao();
@@ -32,8 +32,12 @@ public class Server {
 		logger.info("Initializing repository");
 		sailRepository.init();
 		Iterator<String> iris = dao.iris();
-		while (iris.hasNext())
+		int count = 0;
+		while (iris.hasNext()) {
+			count++;
 			logger.debug(iris.next());
+		}
+		logger.info("DAO knows " + count + "patterns");
 		return sailRepository;
 	}
 
