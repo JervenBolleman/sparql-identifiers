@@ -11,7 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "org.eclipse.rdf4j", "org.example" })
+@ComponentScan(basePackages = { "org.eclipse.rdf4j"})
 @Import(QueryResponder.class)
 public class Server {
 	@Bean

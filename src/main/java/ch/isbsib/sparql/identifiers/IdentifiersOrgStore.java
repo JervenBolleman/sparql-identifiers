@@ -1,6 +1,7 @@
 package ch.isbsib.sparql.identifiers;
 
 import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.sail.SailConnection;
 import org.eclipse.rdf4j.sail.SailException;
 import org.eclipse.rdf4j.sail.helpers.AbstractSail;
@@ -14,6 +15,7 @@ public class IdentifiersOrgStore extends AbstractSail {
 	public IdentifiersOrgStore(Dao dao) {
 	    super();
 	    this.dao = dao;
+	    this.vf = SimpleValueFactory.getInstance();
 	}
 
 	@Override
