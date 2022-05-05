@@ -263,7 +263,7 @@ public class IdentifiersOrgTripleSourceTest {
         TupleQueryResult eval = pTQ.evaluate();
         for (int i = 0; i < 3; i++) {
             // for (int i = 0; i < 10; i++) {
-            assertTrue(eval.hasNext());
+            assertTrue("failed at "+ i, eval.hasNext());
             final BindingSet next = eval.next();
             assertNotNull(next);
             assertTrue(next.getBinding("target").getValue().toString().endsWith("36927"));
