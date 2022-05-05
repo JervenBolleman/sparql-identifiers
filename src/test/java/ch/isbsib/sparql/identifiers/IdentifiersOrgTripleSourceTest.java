@@ -261,7 +261,7 @@ public class IdentifiersOrgTripleSourceTest {
         rep.init();
         TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, queryChebi);
         TupleQueryResult eval = pTQ.evaluate();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             // for (int i = 0; i < 10; i++) {
             assertTrue("failed at "+ i, eval.hasNext());
             final BindingSet next = eval.next();
