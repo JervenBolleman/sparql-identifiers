@@ -108,7 +108,7 @@ public class IdentifiersOrgTripleSourceTest {
         rep.setDataDir(dataDir);
         rep.setValueFactory(SimpleValueFactory.getInstance());
         SailRepository sr = new SailRepository(rep);
-        rep.initialize();
+        rep.init();
         TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query1);
         TupleQueryResult eval = pTQ.evaluate();
         for (int i = 0; i < 13; i++) {
@@ -132,7 +132,7 @@ public class IdentifiersOrgTripleSourceTest {
         rep.setDataDir(dataDir);
         rep.setValueFactory(SimpleValueFactory.getInstance());
         SailRepository sr = new SailRepository(rep);
-        rep.initialize();
+        rep.init();
         TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query2);
         TupleQueryResult eval = pTQ.evaluate();
         assertFalse(eval.hasNext());
@@ -149,7 +149,7 @@ public class IdentifiersOrgTripleSourceTest {
         rep.setDataDir(dataDir);
         rep.setValueFactory(SimpleValueFactory.getInstance());
         SailRepository sr = new SailRepository(rep);
-        rep.initialize();
+        rep.init();
         TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query3);
         TupleQueryResult eval = pTQ.evaluate();
         for (int i = 0; i < 7; i++) {
@@ -172,7 +172,7 @@ public class IdentifiersOrgTripleSourceTest {
         rep.setDataDir(dataDir);
         rep.setValueFactory(SimpleValueFactory.getInstance());
         SailRepository sr = new SailRepository(rep);
-        rep.initialize();
+        rep.init();
         BooleanQuery pTQ = sr.getConnection().prepareBooleanQuery(QueryLanguage.SPARQL, query4);
         assertTrue("Should return true", pTQ.evaluate());
     }
@@ -190,7 +190,7 @@ public class IdentifiersOrgTripleSourceTest {
         rep.setDataDir(dataDir);
         rep.setValueFactory(SimpleValueFactory.getInstance());
         SailRepository sr = new SailRepository(rep);
-        rep.initialize();
+        rep.init();
         TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query5);
         TupleQueryResult eval = pTQ.evaluate();
         for (int i = 0; i < 1; i++) {
@@ -216,7 +216,7 @@ public class IdentifiersOrgTripleSourceTest {
         rep.setDataDir(dataDir);
         rep.setValueFactory(SimpleValueFactory.getInstance());
         SailRepository sr = new SailRepository(rep);
-        rep.initialize();
+        rep.init();
         TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query6);
         TupleQueryResult eval = pTQ.evaluate();
         for (int i = 0; i < 12; i++) {
@@ -258,7 +258,7 @@ public class IdentifiersOrgTripleSourceTest {
         rep.setDataDir(dataDir);
         rep.setValueFactory(SimpleValueFactory.getInstance());
         SailRepository sr = new SailRepository(rep);
-        rep.initialize();
+        rep.init();
         TupleQuery pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, queryChebi);
         TupleQueryResult eval = pTQ.evaluate();
         for (int i = 0; i < 3; i++) {

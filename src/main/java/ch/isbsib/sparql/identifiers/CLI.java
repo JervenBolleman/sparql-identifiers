@@ -49,7 +49,7 @@ public class CLI implements Callable<Integer> {
             rep.setDataDir(dataDir);
             rep.setValueFactory(SimpleValueFactory.getInstance());
             SailRepository sr = new SailRepository(rep);
-            rep.initialize();
+            rep.init();
             Query pTQ = sr.getConnection().prepareTupleQuery(QueryLanguage.SPARQL, query);
             if (pTQ instanceof TupleQuery) {
                 SPARQLResultsCSVWriter handler = new SPARQLResultsCSVWriter(System.out);
