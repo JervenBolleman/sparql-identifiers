@@ -20,7 +20,7 @@ Or a docker image
 
 ```
 mvn spring-boot:build-image
-docker run sparql-identifiers:1.3-SNAPSHOT
+docker run sparql-identifiers:1.4-SNAPSHOT
 ```
 
 Then test with a curl command 
