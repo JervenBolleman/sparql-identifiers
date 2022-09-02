@@ -13,7 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	<spring.boot.version>2.7.3</spring.boot.version>
-        <rdf4j.version>4.1.0</rdf4j.version>
+        <rdf4j.version>4.1.1</rdf4j.version>
     </properties>
     <build>
         <plugins>
